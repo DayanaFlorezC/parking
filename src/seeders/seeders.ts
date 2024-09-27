@@ -12,8 +12,6 @@ export const initSeeders = async () => {
             }
         })
 
-        console.log(existAdmin, 'bala')
-
         if (!existAdmin.length) {
             const user = new User()
 

@@ -15,7 +15,7 @@ export class Parking extends BaseEntity {
     name!: string
 
     @Column()
-    @Min(0)
+    @Min(1, {message: 'minimo 1'})
     @IsInt()
     capacity!: number
 
