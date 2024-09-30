@@ -14,66 +14,47 @@ import {
     updateUser
 } from '../repository/user.repository'
 
-export const getUserService = async ( id: number) => {
-
-    try {
-        return await getUser(id)
-    } catch (error) {
-        console.log(error)
-    }
+export const getUserService = async (id: number) => {
+    return await getUser(id)
 }
 
 export const getUsersService = async (query: object) => {
-
-    try {
-        return await getUsers(query)
-    } catch (error) {
-        console.log(error)
-    }
+    return await getUsers(query)
 }
 
 export const createUserService = async (data: User) => {
     try {
-
         const hashedPassword = await bcrypt.hash(data.password, 10);
 
         const user = {
             ...data,
             password: hashedPassword
         }
-    
+
         return await createUser(user)
 
     } catch (error) {
         console.log(error)
+        throw new Error("Error in create user service");
     }
 }
 
 
 export const updateUserService = async (updateData: User, id: number) => {
-    try {
-        return await updateUser(updateData, id)
-    } catch (error) {
-        console.log(error)
-    }
+    return await updateUser(updateData, id)
 }
 
 
 export const deleteUserService = async (id: number) => {
-    try {
-        return await deleteUser(id)
-    } catch (error) {
-        console.log(error)
-    }
+    return await deleteUser(id)
 }
 
 export const loginService = async (email: string, password: string) => {
     try {
-
         const users = await getUsers({ email: email })
 
         if (!users || !users.length) return {
-            exeption: true,
+            exception: true,
             msg: 'No se encontro el usuario'
         }
 
@@ -82,19 +63,19 @@ export const loginService = async (email: string, password: string) => {
 
         const isMatch = bcrypt.compareSync(password, user.password);
 
-        if(!isMatch) return {
-            exeption: true, 
+        if (!isMatch) return {
+            exeption: true,
             msg: 'La contraseña no coincide'
         }
 
         const secret = process.env.secretKeyJWT
 
         //?create token
-        const token = jwt.sign({ id: user.id, role: user.role, email: user.email }, secret+'', { expiresIn: '6h' });
+        const token = jwt.sign({ id: user.id, role: user.role, email: user.email }, secret + '', { expiresIn: '6h' });
 
-        return token
-    
+        return {token}
+
     } catch (error) {
-        console.log(error)
+       throw new Error("Error in login user service");
     }
 }

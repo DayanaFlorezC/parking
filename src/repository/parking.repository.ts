@@ -1,49 +1,47 @@
 import { Parking } from "../entity/Parking";
 
-export const getParkings =  async (query : object) =>{
-    try {
+export const getParkings = async (query: object) => {
+  try {
 
-        return await Parking.find({where: query})
-        
-    } catch (error) {
-        console.log(error)
-    }
+    return await Parking.find({ where: query })
+
+  } catch (error) {
+    console.log(error)
+    throw new Error("Error al obtener los parqueaderos");
+
+  }
 }
 
 
 export const getParking = async (query: object, id: number) => {
   try {
-    const parking = await Parking.findOneBy({ id: id, ...query });
-
-    if (!parking) return null
-
-    return parking
+    return await Parking.findOneBy({ id: id, ...query });
   } catch (error) {
     if (error instanceof Error) {
-      return false
+      throw new Error("Error al obtener un parqueadero");
     }
   }
 };
 
-export const createParking = async (data : Parking) => {
+export const createParking = async (data: Parking) => {
   try {
     const { name, capacity, costByHour } = data;
     const parking = new Parking();
     parking.name = name;
     parking.capacity = capacity;
-    parking.costByHour = costByHour; 
-    parking.createdAt= new Date();
+    parking.costByHour = costByHour;
+    parking.createdAt = new Date();
     await parking.save();
     return parking
-    
+
   } catch (error) {
     console.log(error)
-    throw Error 
+    throw new Error("Error al crear un parqueadero");
   }
 
 };
 
-export const updateParking = async (dataUpdate: Parking, id: number ) => {
+export const updateParking = async (dataUpdate: Parking, id: number) => {
 
   try {
     const parking = await Parking.findOneBy({ id: id });
@@ -53,24 +51,20 @@ export const updateParking = async (dataUpdate: Parking, id: number ) => {
 
     return parking
   } catch (error) {
-    if (error instanceof Error) {
-      return false
-    }
+    throw new Error("Error al editar un parqueadero");
   }
 };
 
 export const deleteParking = async (id: number) => {
   try {
-    const result = await Parking.delete({ id: id });
+    const result= await Parking.delete({ id: id });
 
     if (result.affected === 0)
-      return  null
+      return null
 
-    return 'ok'
+    return result.raw
   } catch (error) {
-    if (error instanceof Error) {
-      return false
-    }
+    throw new Error("Error al borrar un parqueadero");
   }
 };
 

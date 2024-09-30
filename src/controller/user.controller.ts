@@ -1,18 +1,14 @@
 import { Request, Response } from "express";
+import { Httpresponse } from "../utils/response/http.response"
 
-interface UserBody {
-  name: string;
-  email: string;
-  password: string;
-  role: string,
-}
+const httpResponse = new Httpresponse()
 
 import {
   getUserService,
   getUsersService,
   updateUserService,
   deleteUserService,
-  createUserService, 
+  createUserService,
   loginService
 } from '../services/user.service'
 
@@ -22,10 +18,11 @@ export const getUsers = async (req: Request, res: Response) => {
 
     const query = req.query || {}
     const users = await getUsersService(query)
-    return res.json(users);
+    if (!users) return httpResponse.NotFound(res, 'Error al obtener los usuarios')
+    return httpResponse.OK(res, users)
   } catch (error) {
     if (error instanceof Error) {
-      return res.status(500).json({ message: error.message });
+      return httpResponse.Error(res, error.message)
     }
   }
 };
@@ -35,30 +32,28 @@ export const getUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const user = await getUserService(+id)
-
-    if (!user) return res.status(404).json({ message: "User not found" });
-
-    return res.json(user);
+    if (!user) return httpResponse.NotFound(res, 'No se pudo obtener el usuario')
+    return httpResponse.OK(res, user)
   } catch (error) {
     if (error instanceof Error) {
-      return res.status(500).json({ message: error.message });
+      return httpResponse.Error(res, error.message)
     }
   }
 };
 
-export const createUser = async (req: Request, res: Response) => {
+export const createUser = async (req: any, res: Response) => {
 
   try {
     const data = req.body;
-  
+
     const resp = await createUserService(data)
 
-    if (!resp) return res.status(400).json(null)
-
-    return res.json(data);
+    if (!resp) return httpResponse.NotFound(res, 'No se pudo crear el usuario')
+    return httpResponse.OK(res, resp)
   } catch (error) {
-    console.log(error)
-    res.status(400).json({ message: 'x' })
+    if (error instanceof Error) {
+      return httpResponse.Error(res, error.message)
+    }
   }
 
 
@@ -67,16 +62,19 @@ export const createUser = async (req: Request, res: Response) => {
 
 export const login = async (req: Request, res: Response) => {
   try {
-    const {email, password} = req.body
-    const token = await loginService(email, password)
+    const { email, password } = req.body
+    const resp = await loginService(email, password)
 
-    if(!token) return res.status(400).json(null)
+    if (!resp) return httpResponse.NotFound(res, 'No se pudo loggear el usuario')
 
-    res.json(token)
+    if (resp.exception) return httpResponse.NotFound(res, resp.msg)
+
+      return httpResponse.OK(res, resp)
 
   } catch (error) {
-    console.log(error)
-    res.status(400)
+    if (error instanceof Error) {
+      return httpResponse.Error(res, error.message)
+    }
   }
 }
 
@@ -85,12 +83,14 @@ export const updateUser = async (req: Request, res: Response) => {
 
   try {
 
-    await updateUserService(req.body, +id)
+    const resp = await updateUserService(req.body, +id)
 
-    return res.sendStatus(204);
+    if(!resp) return httpResponse.NotFound(res, 'User not found')
+
+    return httpResponse.OK(res, resp)
   } catch (error) {
     if (error instanceof Error) {
-      return res.status(500).json({ message: error.message });
+      return httpResponse.Error(res, error.message)
     }
   }
 };
@@ -101,12 +101,12 @@ export const deleteUser = async (req: Request, res: Response) => {
     const result = await deleteUserService(+id)
 
     if (!result)
-      return res.status(404).json({ message: "User not found" });
+      return httpResponse.NotFound(res, 'User not found');
 
-    return res.sendStatus(204);
+    return httpResponse.OK(res, result)
   } catch (error) {
     if (error instanceof Error) {
-      return res.status(500).json({ message: error.message });
+      return httpResponse.Error(res, error.message)
     }
   }
 };

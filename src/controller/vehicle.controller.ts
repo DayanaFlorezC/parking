@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { Httpresponse } from "../utils/response/http.response";
 
 import {
     createRegisterService,
@@ -8,17 +9,22 @@ import {
     updateRegisterService
 } from "../services/vehicle.service";
 
-export const createRegisterController = async (req: Request, res: Response) =>{
+const httpResponse = new Httpresponse()
+
+export const createRegisterController = async (req: any, res: Response) =>{
     try {
+
         const data = req.body;
-        data.idPartner = 14 //! ojo con esto
+        data.idPartner = req.id 
         const register = await createRegisterService(data);
 
-        if(!register) return res.status(400).json({message: 'No se pudo realizar el registro del vehiculo'})
+        if(!register) return httpResponse.NotFound(res, 'Register not found');
 
-        res.json({register, message: 'ok'})
+        return httpResponse.OK(res, register)
     } catch (error) {
-        console.log(error)
+        if (error instanceof Error) {
+            return httpResponse.Error(res, error.message)
+        }
     }
 }
 
@@ -30,12 +36,14 @@ export const getRegisterController = async (req: Request, res: Response) =>{
 
         const resp = await getRegisterService(query, +id)
 
-        if(!resp) return res.status(400).json({message: 'No se pudo obtener el registro'})
+        if(!resp) return httpResponse.NotFound(res, 'Register not found');
 
-        res.json({register: resp, message: 'ok'})
+        return httpResponse.OK(res, resp)
         
     } catch (error) {
-        console.log(error)
+        if (error instanceof Error) {
+            return httpResponse.Error(res, error.message)
+        }
     }
 }
 export const getRegistersController = async (req: Request, res: Response) =>{
@@ -43,11 +51,13 @@ export const getRegistersController = async (req: Request, res: Response) =>{
         const query = req.query || {}
         const resp = await getRegistersService(query)
 
-        if(!resp) return res.status(400).json({message: 'No se pudo obtener el registro'})
+        if(!resp) return httpResponse.NotFound(res, 'Register not found');
 
-        res.json({registers: resp, message: 'ok'})
+        return httpResponse.OK(res, resp)
     } catch (error) {
-        console.log(error)
+        if (error instanceof Error) {
+            return httpResponse.Error(res, error.message)
+        }
     }
 }
 
@@ -58,11 +68,13 @@ export const updateRegisterController = async (req: Request, res: Response) =>{
         const data = req.body
         const resp = await updateRegisterService(data, +id)
 
-        if(!resp) return res.status(400).json({message: 'No se pudo obtener el registro'})
+        if(!resp) return httpResponse.NotFound(res, 'Register not found');
 
-        res.json({register: resp, message: 'ok'})
+        return httpResponse.OK(res, resp)
     } catch (error) {
-        console.log(error)
+        if (error instanceof Error) {
+            return httpResponse.Error(res, error.message)
+        }
     }
 }
 
@@ -72,11 +84,13 @@ export const deleteRegisterController = async (req: Request, res: Response) =>{
         const {id} = req.params
         const resp = await deleteRegisterService(+id)
 
-        if(!resp) return res.status(400).json({message: 'No se pudo obtener el registro'})
+        if(!resp) return httpResponse.NotFound(res, 'Register not found');
 
-        res.json({register: resp, message: 'ok'})
+        return httpResponse.OK(res, resp)
         
     } catch (error) {
-        console.log(error)
+        if (error instanceof Error) {
+            return httpResponse.Error(res, error.message)
+        }
     }
 }

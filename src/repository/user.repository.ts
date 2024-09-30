@@ -8,14 +8,18 @@ interface UserBody {
   createdAt: Date
 }
 
+interface UserResponse {
+  name: string;
+  email: string;
+  role: string,
+  createdAt: Date
+}
+
 export const getUsers = async (query: object) => {
   try {
-    return await User.find({where: query});
+    return await User.find({ where: query });
   } catch (error) {
-    if (error instanceof Error) {
-      return false
-      //!recuera hacer el manejador de errores 
-    }
+    throw new Error("Error al obtener los usuarios");
   }
 };
 
@@ -27,59 +31,55 @@ export const getUser = async (id: number) => {
 
     return user
   } catch (error) {
-    if (error instanceof Error) {
-      return false
-    }
+    throw new Error("Error en get one user");
   }
 };
 
-export const createUser = async (data : UserBody) => {
+export const createUser = async (data: UserBody) => {
   try {
     const { name, email, password } = data;
     const user = new User();
     user.name = name;
     user.email = email;
-    user.password = password; 
+    user.password = password;
     user.role = 'socio';
-    user.createdAt= new Date();
+    user.createdAt = new Date();
     await user.save();
+
     return user
-    
+
   } catch (error) {
     console.log(error)
-    throw Error 
+    throw new Error("Error al crear el usuario");
   }
 
 };
 
-export const updateUser = async (dataUpdate: UserBody, id: number ) => {
+export const updateUser = async (dataUpdate: UserBody, id: number) => {
 
   try {
-    const user = await User.findOneBy({ id: id});
+    const user = await User.findOneBy({ id: id });
     if (!user) return null
 
     await User.update({ id: id }, dataUpdate);
 
     return user
   } catch (error) {
-    if (error instanceof Error) {
-      return false
-    }
+    console.log(error)
+    throw new Error("Error al editar el usuario");
   }
 };
 
 export const deleteUser = async (id: number) => {
   try {
-    const result = await User.delete({ id: id});
+    const result = await User.delete({ id: id });
 
     if (result.affected === 0)
-      return  null
+      return null
 
-    return 'ok'
+    return result
   } catch (error) {
-    if (error instanceof Error) {
-      return false
-    }
+    throw new Error("Error al borrar el usuario");
   }
 };
 

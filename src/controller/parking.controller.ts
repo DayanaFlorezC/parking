@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { Httpresponse } from "../utils/response/http.response";
 
 import {
     createParkingService,
@@ -8,85 +9,88 @@ import {
     deleteParkingService
 } from '../services/parking.service'
 
-export const getParkingController = async (req: Request, res: Response) =>{
+const httpResponse = new Httpresponse()
+
+export const getParkingController = async (req: Request, res: Response) => {
     try {
-        const {id} = req.params;
-        const query = req.query  || {}
+        const { id } = req.params;
+        const query = req.query || {}
         const parking = await getParkingService(query, +id)
 
-        if(!parking) return res.status(400).json({
-            message: 'No se encontró el parqueadero'
-        })
+        if (!parking) return httpResponse.NotFound(res, 'Parking not found');
 
-        res.json({parking, message: 'ok'})
+        return httpResponse.OK(res, parking)
     } catch (error) {
-        console.log(error)
+        if (error instanceof Error) {
+            return httpResponse.Error(res, error.message)
+        }
     }
 }
 
 
-export const getParkingsController = async (req: Request, res: Response) =>{
+export const getParkingsController = async (req: Request, res: Response) => {
     try {
-        const {id} = req.params;
-        const query = req.query  || {}
+        const query = req.query || {}
         const parking = await getParkingsService(query)
 
-        if(!parking) return res.status(400).json({
-            message: 'No se encontró el parqueadero'
-        })
+        if (!parking) return httpResponse.NotFound(res, 'Parking not found');
 
-        res.json({parking, message: 'ok'})
+        return httpResponse.OK(res, parking)
     } catch (error) {
-        console.log(error)
+        if (error instanceof Error) {
+            return httpResponse.Error(res, error.message)
+        }
     }
 }
 
 
-export const updateParkingController = async (req: Request, res: Response) =>{
+export const updateParkingController = async (req: Request, res: Response) => {
     try {
-        const {id} = req.params;
+        const { id } = req.params;
         const data = req.body;
 
         const resp = await updateParkingService(data, +id)
 
-        if(!resp) return res.status(400).json({
-            message: 'No se encontró el parqueadero'
-        })
+        if (!resp) return httpResponse.NotFound(res, 'Parking not found');
 
-        res.json({parking: resp, message: 'ok'})
+        return httpResponse.OK(res, resp)
     } catch (error) {
-        console.log(error)
+        if (error instanceof Error) {
+            return httpResponse.Error(res, error.message)
+        }
     }
 }
 
 
-export const deleteParkingController = async (req: Request, res: Response) =>{
+export const deleteParkingController = async (req: Request, res: Response) => {
     try {
-        const {id} = req.params;
+        const { id } = req.params;
 
         const resp = await deleteParkingService(+id)
 
-        if(!resp) return res.status(400).json({
-            message: 'No se encontró el parqueadero'
-        })
+        if (!resp) return httpResponse.NotFound(res, 'Parking not found');
 
-        res.json({parking: resp, message: 'ok'})
+        return httpResponse.OK(res, resp)
     } catch (error) {
-        console.log(error)
+        if (error instanceof Error) {
+            return httpResponse.Error(res, error.message)
+        }
     }
 }
 
 
-export const createParkingController = async (req: Request, res: Response) =>{
+export const createParkingController = async (req: Request, res: Response) => {
     try {
         const data = req.body;
-  
+
         const resp = await createParkingService(data)
-        
-        if (!resp) return res.status(400).json(null)
-    
-        return res.json(data);
+
+        if (!resp) return httpResponse.NotFound(res, 'Parking not found');
+
+        return httpResponse.OK(res, resp)
     } catch (error) {
-        console.log(error)
+        if (error instanceof Error) {
+            return httpResponse.Error(res, error.message)
+        }
     }
 }

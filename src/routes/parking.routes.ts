@@ -6,18 +6,42 @@ import {
     getParkingController,
     getParkingsController,
     updateParkingController
-} from '../controller/parking.controller'
+} from '../controller/parking.controller';
+
+import {
+    authMiddleware,
+    authAdmin,
+} from '../middlewares/auth'
 
 const router = Router();
 
-router.get('/parking', getParkingsController as RequestHandler)
+router.get('/parking', 
+    authMiddleware as RequestHandler,
+    authAdmin as RequestHandler, 
+    getParkingsController as RequestHandler
+)
 
-router.get("/parking/:id", getParkingController as RequestHandler);
+router.get("/parking/:id", 
+    authMiddleware as RequestHandler, 
+    getParkingController as RequestHandler
+);
 
-router.post("/parking", createParkingController as RequestHandler);
+router.post("/parking", 
+    authMiddleware as RequestHandler, 
+    authAdmin as RequestHandler,
+    createParkingController as RequestHandler
+);
 
-router.put("/parking/:id", updateParkingController as RequestHandler);
+router.put("/parking/:id", 
+    authMiddleware as RequestHandler,
+    authAdmin as RequestHandler, 
+    updateParkingController as RequestHandler
+);
 
-router.delete("/parking/:id", deleteParkingController as RequestHandler);
+router.delete("/parking/:id", 
+    authMiddleware as RequestHandler, 
+    authAdmin as RequestHandler,
+    deleteParkingController as RequestHandler
+);
 
 export default router;
