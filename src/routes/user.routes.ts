@@ -6,7 +6,8 @@ import {
     createUser,
     updateUser,
     deleteUser,
-    login
+    login,
+    sendEmailController
 } from '../controller/user.controller'
 
 import {
@@ -45,6 +46,8 @@ router.delete("/user/:id",
 );
 
 router.post("/user/login", login as RequestHandler)
+
+router.post("/user/email", sendEmailController as RequestHandler)
 
 
 

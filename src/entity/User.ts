@@ -1,8 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, Unique  } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, Unique, BeforeInsert, OneToMany  } from "typeorm";
 import {
     IsEmail,
     IsDate,
+    validate
 } from "class-validator"
+
+import { Parking } from "./Parking";
+import { Vehicle } from "./Vehicle";
 
 @Entity()
 @Unique(["email"])
@@ -18,7 +22,7 @@ export class User extends BaseEntity {
     @IsEmail()
     email!: string
 
-    @Column()
+    @Column({ select: false })
     password!: string
 
     @Column()
@@ -27,4 +31,21 @@ export class User extends BaseEntity {
     @Column()
     @IsDate()
     createdAt!: Date
+
+    @OneToMany(() => Parking, (parking) => parking.user)
+    parkings: Parking[];
+
+    @OneToMany(() => Vehicle, (vehicle) => vehicle.user)
+    vehicles: Vehicle[];
+
+    @BeforeInsert()
+    async validateEntity() {
+        const errors = await validate(this);
+        if (errors.length > 0) {
+            throw new Error(`Validation failed! ${errors}`);
+        }
+    }
+
+
+  
 }

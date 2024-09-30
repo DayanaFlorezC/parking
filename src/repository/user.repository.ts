@@ -17,15 +17,18 @@ interface UserResponse {
 
 export const getUsers = async (query: object) => {
   try {
-    return await User.find({ where: query });
+    return await User.find({ where: query, relations: {
+      parkings: true
+    }});
   } catch (error) {
+    console.log(error)
     throw new Error("Error al obtener los usuarios");
   }
 };
 
 export const getUser = async (id: number) => {
   try {
-    const user = await User.findOneBy({ id: id });
+    const user = await User.findOne({ where:{ id: id}, relations: { vehicles: true, parkings: true} });
 
     if (!user) return null
 

@@ -6,7 +6,8 @@ import {
     deleteRegisterService,
     getRegisterService,
     getRegistersService,
-    updateRegisterService
+    updateRegisterService,
+    createExitRegisterVehService
 } from "../services/vehicle.service";
 
 const httpResponse = new Httpresponse()
@@ -15,13 +16,31 @@ export const createRegisterController = async (req: any, res: Response) =>{
     try {
 
         const data = req.body;
-        data.idPartner = req.id 
+
         const register = await createRegisterService(data);
 
         if(!register) return httpResponse.NotFound(res, 'Register not found');
 
         return httpResponse.OK(res, register)
     } catch (error) {
+        if (error instanceof Error) {
+            return httpResponse.Error(res, error.message)
+        }
+    }
+}
+
+export const createExitRegisterVeh = async (req: any, res: Response ) =>{
+    try {
+        const {placa, parkingId} = req.body;
+       const result = await createExitRegisterVehService(placa, parkingId)
+
+       if(!result) return httpResponse.NotFound(res, 'Register not found');
+       
+      // if(result.exception) return httpResponse.NotFound(res, result.msg);
+
+       return httpResponse.OK(res, result)
+    } catch (error) {
+        console.log(error)
         if (error instanceof Error) {
             return httpResponse.Error(res, error.message)
         }

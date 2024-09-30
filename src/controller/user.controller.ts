@@ -9,11 +9,12 @@ import {
   updateUserService,
   deleteUserService,
   createUserService,
-  loginService
+  loginService,
+  sendEmailService
 } from '../services/user.service'
 
 
-export const getUsers = async (req: Request, res: Response) => {
+export const getUsers = async (req: any, res: Response) => {
   try {
 
     const query = req.query || {}
@@ -28,9 +29,14 @@ export const getUsers = async (req: Request, res: Response) => {
 };
 
 
-export const getUser = async (req: Request, res: Response) => {
+export const getUser = async (req: any, res: Response) => {
   try {
     const { id } = req.params;
+
+    const userLog = req.user
+
+    if (userLog.role !== 'admin' && userLog.id !== +id) return httpResponse.Forbbiden(res, 'No autorizado')
+
     const user = await getUserService(+id)
     if (!user) return httpResponse.NotFound(res, 'No se pudo obtener el usuario')
     return httpResponse.OK(res, user)
@@ -69,23 +75,28 @@ export const login = async (req: Request, res: Response) => {
 
     if (resp.exception) return httpResponse.NotFound(res, resp.msg)
 
-      return httpResponse.OK(res, resp)
+    return httpResponse.OK(res, resp)
 
   } catch (error) {
+    console.log(error)
     if (error instanceof Error) {
       return httpResponse.Error(res, error.message)
     }
   }
 }
 
-export const updateUser = async (req: Request, res: Response) => {
+export const updateUser = async (req: any, res: Response) => {
   const { id } = req.params;
+
+  const user = req.user;
+
+  if (user.id === +id) return httpResponse.Forbbiden(res, 'No se puede editar el admin')
 
   try {
 
     const resp = await updateUserService(req.body, +id)
 
-    if(!resp) return httpResponse.NotFound(res, 'User not found')
+    if (!resp) return httpResponse.NotFound(res, 'User not found')
 
     return httpResponse.OK(res, resp)
   } catch (error) {
@@ -111,4 +122,16 @@ export const deleteUser = async (req: Request, res: Response) => {
   }
 };
 
+
+export const sendEmailController = async (req: Request, res: Response) =>{
+  try {
+    res.send('ok')
+  } catch (error) {
+    console.log(error)
+    if (error instanceof Error) {
+      return httpResponse.Error(res, error.message)
+    }
+  }
+
+}
 

@@ -1,9 +1,22 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from "typeorm";
+import { 
+    Entity, 
+    PrimaryGeneratedColumn, 
+    Column, 
+    BaseEntity, 
+    BeforeInsert, 
+    ManyToOne, 
+    JoinColumn,
+    OneToMany 
+} from "typeorm";
+
 import {
     IsInt,
     IsDate,
     Min,
+    validate
 } from "class-validator"
+import { User } from "./User";
+import { Vehicle } from "./Vehicle";
 
 @Entity()
 export class Parking extends BaseEntity {
@@ -15,7 +28,7 @@ export class Parking extends BaseEntity {
     name!: string
 
     @Column()
-    @Min(1, {message: 'minimo 1'})
+    @Min(1, { message: 'minimo 1' })
     @IsInt()
     capacity!: number
 
@@ -26,5 +39,24 @@ export class Parking extends BaseEntity {
     @Column()
     @IsDate()
     createdAt!: Date
+
+    @Column()
+    userId: number
+    
+    @ManyToOne(() => User, (user) => user.parkings)
+    @JoinColumn({name: "userId"})
+    user: User;
+
+    @OneToMany(() => Vehicle, (vehicle) => vehicle.parking)
+    vehicles: Vehicle[];
+
+    @BeforeInsert()
+    async validateEntity() {
+        const errors = await validate(this);
+        if (errors.length > 0) {
+            throw new Error(`Validation failed! ${errors}`);
+        }
+    }
+
 
 }

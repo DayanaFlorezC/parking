@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert } from "typeorm"
+import { validate, IsEmail } from "class-validator"
 
 @Entity()
 export class Email {
@@ -7,9 +8,11 @@ export class Email {
     id!: number
 
     @Column()
+    @IsEmail()
     to!: string
 
     @Column()
+    @IsEmail()
     from!: string
 
     @Column()
@@ -20,4 +23,13 @@ export class Email {
 
     @Column()
     createdAt!: Date
+
+    
+    @BeforeInsert()
+    async validateEntity() {
+        const errors = await validate(this);
+        if (errors.length > 0) {
+            throw new Error(`Validation failed! ${errors}`);
+        }
+    }
 }

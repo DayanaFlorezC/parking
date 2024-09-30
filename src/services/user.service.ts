@@ -41,7 +41,14 @@ export const createUserService = async (data: User) => {
 
 
 export const updateUserService = async (updateData: User, id: number) => {
-    return await updateUser(updateData, id)
+    try{
+        return await updateUser(updateData, id)
+    }catch(error){
+        console.log(error)
+        throw new Error("Error servicio editar usuario");
+        
+    }
+   
 }
 
 
@@ -72,10 +79,21 @@ export const loginService = async (email: string, password: string) => {
 
         //?create token
         const token = jwt.sign({ id: user.id, role: user.role, email: user.email }, secret + '', { expiresIn: '6h' });
-
         return {token}
 
     } catch (error) {
+        console.log(error)
        throw new Error("Error in login user service");
+    }
+}
+
+export const sendEmailService = (data: any) =>{
+    try {
+        //!TODO
+        return 'ok'
+    } catch (error) {
+        console.log(error)
+        throw new Error("Error en send email");
+        
     }
 }

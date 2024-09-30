@@ -3,7 +3,9 @@ import { Parking } from "../entity/Parking";
 export const getParkings = async (query: object) => {
   try {
 
-    return await Parking.find({ where: query })
+    return await Parking.find({ where: query, relations: {
+      vehicles: true
+    } })
 
   } catch (error) {
     console.log(error)
@@ -15,7 +17,7 @@ export const getParkings = async (query: object) => {
 
 export const getParking = async (query: object, id: number) => {
   try {
-    return await Parking.findOneBy({ id: id, ...query });
+    return await Parking.findOne( { where:{ id: id, ...query}, relations: { vehicles: true} } );
   } catch (error) {
     if (error instanceof Error) {
       throw new Error("Error al obtener un parqueadero");
@@ -25,12 +27,14 @@ export const getParking = async (query: object, id: number) => {
 
 export const createParking = async (data: Parking) => {
   try {
-    const { name, capacity, costByHour } = data;
+
+    const { name, capacity, costByHour, userId } = data;
     const parking = new Parking();
     parking.name = name;
     parking.capacity = capacity;
     parking.costByHour = costByHour;
     parking.createdAt = new Date();
+    parking.userId = userId
     await parking.save();
     return parking
 

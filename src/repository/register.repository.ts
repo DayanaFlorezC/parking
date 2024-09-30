@@ -1,8 +1,22 @@
+import { IsNull } from "typeorm";
 import { Vehicle } from "../entity/Vehicle";
 
 export const getRegisters = async (query: object) => {
   try {
-    return await Vehicle.find({ where: query })
+    return await Vehicle.find({where: query })
+  } catch (error) {
+    throw new Error("Error al obtener varios registros");
+  }
+}
+
+
+export const getRegisterWithoutDateOut = async (query: object) => {
+  try {
+
+    return await Vehicle.findOne({where: {
+      dateOut: IsNull(),
+      ...query
+    } })
   } catch (error) {
     throw new Error("Error al obtener varios registros");
   }
@@ -21,12 +35,13 @@ export const getRegister = async (query: object, id: number) => {
 
 export const createRegister = async (data: Vehicle) => {
   try {
-    const { placa, idParking, idPartner } = data;
+    const { placa, parkingId, partnerId } = data;
     const register = new Vehicle();
     register.placa = placa;
-    register.idParking = idParking;
-    register.idPartner = idPartner;
+    register.parkingId = parkingId;
+    register.partnerId = partnerId;
     register.dateIn = new Date();
+
     await register.save();
     return register
 
@@ -37,7 +52,7 @@ export const createRegister = async (data: Vehicle) => {
 
 };
 
-export const updateRegister = async (dataUpdate: Vehicle, id: number) => {
+export const updateRegister = async (dataUpdate: any, id: number) => {
 
   try {
     const register = await Vehicle.findOneBy({ id: id });
