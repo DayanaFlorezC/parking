@@ -22,7 +22,7 @@ export class User extends BaseEntity {
     @IsEmail()
     email!: string
 
-    @Column({ select: false })
+    @Column({  })
     password!: string
 
     @Column()

@@ -4,7 +4,8 @@ import {
     deleteParking,
     getParking,
     getParkings,
-    updateParking
+    updateParking,
+    getTopParkings
 } from '../repository/parking.repository';
 
 export const getParkingService = async (query: object, id: number) =>{
@@ -30,12 +31,6 @@ export const updateParkingService = async (updateData: Parking, id: number) =>{
 
         if(!parking) return null
 
-        const capacity = parking.capacity
-
-        if(updateData.capacity > parking.vehicles.length) return {
-            exception : true,
-            msg: 'No se puede modificar la capacidad de un parqueadero menor a la cantidad actual que tiene'
-        }
 
         return await updateParking(updateData, id)
     } catch (error) {
@@ -48,4 +43,9 @@ export const updateParkingService = async (updateData: Parking, id: number) =>{
 
 export const deleteParkingService = async (id: number) =>{
         return await deleteParking(id)
+}
+
+
+export const getTopParkingsService = async () =>{
+    return await getTopParkings()
 }

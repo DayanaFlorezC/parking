@@ -5,7 +5,15 @@ import {
     getRegister,
     getRegisters,
     updateRegister,
-    getRegisterWithoutDateOut
+    getRegisterWithoutDateOut,
+    getTopVeh,
+    getTopVehOneParking,
+    getFirstVeh,
+    getEarnings,
+    getEarningsToday,
+    getEarningsLastWeek,
+    getEarningsLastMonth,
+    getEarningsLastYear
 } from '../repository/register.repository';
 
 import {
@@ -46,6 +54,8 @@ export const createRegisterService = async (data: Vehicle) => {
             exception: true,
             msg: "No hay espacio"
         }
+
+        //validation 
 
         return await createRegister(data)
     } catch (error) {
@@ -105,4 +115,50 @@ export const createExitRegisterVehService = async (placa: string, parkingId: num
 
     }
 
+}
+
+
+export const getTopVehService = async (parkingId: number, type: string) => {
+    try {
+
+        switch (type) {
+            case "all":
+                return await getTopVeh()
+            case "first":
+                return await getFirstVeh(parkingId)
+            case "one":
+                return await getTopVehOneParking(parkingId)
+            default:
+                return false
+        }
+
+    } catch (error) {
+        console.log(error)
+        throw new Error("Error en el servicio indicador vehiculos");
+    }
+
+}
+
+
+export const getEarningsService = async (type: string, parkingId: number) => {
+    try {
+        switch (type) {
+            case 'all':
+                return await getEarnings(parkingId)
+            case 'today':
+                return await getEarningsToday(parkingId)
+            case 'lastweek':
+                return await getEarningsLastWeek(parkingId)
+            case 'lastmonth':
+                return await getEarningsLastMonth(parkingId)
+            case 'lastyear':
+                return await getEarningsLastYear(parkingId)
+
+            default:
+                return false
+        }
+    } catch (error) {
+        console.log(error)
+        throw new Error("Error en el servicio indicador ganancias");
+    }
 }

@@ -1,4 +1,7 @@
 import { User } from "../entity/User";
+import { Email } from "../entity/Email";
+
+import { AppDataSource } from "../data-source";
 
 interface UserBody {
   name: string;
@@ -17,9 +20,11 @@ interface UserResponse {
 
 export const getUsers = async (query: object) => {
   try {
-    return await User.find({ where: query, relations: {
-      parkings: true
-    }});
+    return await User.find({
+      where: query, relations: {
+        parkings: true
+      }
+    });
   } catch (error) {
     console.log(error)
     throw new Error("Error al obtener los usuarios");
@@ -28,7 +33,7 @@ export const getUsers = async (query: object) => {
 
 export const getUser = async (id: number) => {
   try {
-    const user = await User.findOne({ where:{ id: id}, relations: { vehicles: true, parkings: true} });
+    const user = await User.findOne({ where: { id: id }, relations: { vehicles: true, parkings: true } });
 
     if (!user) return null
 
@@ -87,3 +92,44 @@ export const deleteUser = async (id: number) => {
 };
 
 
+export const createEmail= async (data: Email) =>{
+  try {
+    const {to, from, subject, message } = data;
+    const email = new Email();
+    email.to = to;
+    email.from = from;
+    email.subject = subject;
+    email.createdAt = new Date();
+    email.message = message;
+    await email.save();
+
+    return email
+
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+//?Indicador socios
+export const getTopSocios = async () => {
+  try {
+
+    const oneWeekAgo = new Date(new Date().setDate(new Date().getDate() - 7));
+    const vehRepository = AppDataSource.getRepository('User')
+
+    const result = await vehRepository.createQueryBuilder('user')
+      .leftJoinAndSelect("user.vehicles", "vehicle")
+      .where('vehicle.dateIn > :oneWeekAgo', { oneWeekAgo })
+      .select('user.id', 'id')
+      .addSelect('COUNT(vehicle.id)', 'vehiclecount')
+      .groupBy('user.id')
+      .orderBy('vehiclecount', 'DESC')
+      .limit(3)
+      .getRawMany()
+
+    return result
+  } catch (error) {
+    console.log(error)
+    throw new Error("Error consulta indicador ");
+  }
+}

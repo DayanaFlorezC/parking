@@ -7,7 +7,9 @@ import {
     getRegisterService,
     getRegistersService,
     updateRegisterService,
-    createExitRegisterVehService
+    createExitRegisterVehService,
+    getTopVehService,
+    getEarningsService
 } from "../services/vehicle.service";
 
 const httpResponse = new Httpresponse()
@@ -108,6 +110,47 @@ export const deleteRegisterController = async (req: Request, res: Response) =>{
         return httpResponse.OK(res, resp)
         
     } catch (error) {
+        if (error instanceof Error) {
+            return httpResponse.Error(res, error.message)
+        }
+    }
+}
+
+
+
+//?Indicadores 
+export const getStadisticsVehicles = async (req: Request, res: Response ) =>{
+    try{
+
+        const parkingId = req.query.parkingId || 16;
+        const type = (req.query.type === undefined) ? 'all' : req.query.type+'';
+
+        const resp =await getTopVehService(+parkingId, type);
+        if(!resp) return httpResponse.NotFound(res, 'not found');
+
+        return httpResponse.OK(res, resp)
+    }catch(error){
+        console.log(error)
+        if (error instanceof Error) {
+            return httpResponse.Error(res, error.message)
+        }
+    }
+}
+
+
+export const getEarningsControllers = async (req: Request, res: Response) =>{
+    try {
+
+        const parkingId = req.query.parkingId || 16;
+        const type = (req.query.type === undefined) ? 'all' : req.query.type+'';
+
+        const resp = await getEarningsService(type, +parkingId)
+        if(!resp) return httpResponse.NotFound(res, 'not found');
+
+        return httpResponse.OK(res, resp)
+
+    } catch (error) {
+        console.log(error)
         if (error instanceof Error) {
             return httpResponse.Error(res, error.message)
         }

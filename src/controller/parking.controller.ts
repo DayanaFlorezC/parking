@@ -6,7 +6,8 @@ import {
     updateParkingService,
     getParkingService,
     getParkingsService,
-    deleteParkingService
+    deleteParkingService,
+    getTopParkingsService
 } from '../services/parking.service'
 
 const httpResponse = new Httpresponse()
@@ -89,6 +90,19 @@ export const createParkingController = async (req: Request, res: Response) => {
 
         return httpResponse.OK(res, resp)
     } catch (error) {
+        if (error instanceof Error) {
+            return httpResponse.Error(res, error.message)
+        }
+    }
+}
+
+export const getTopParkingsController = async (req: Request, res: Response) => {
+    try {
+        const resp = await getTopParkingsService()
+        if(!resp) return httpResponse.NotFound(res, 'not found');
+        return httpResponse.OK(res, resp)
+    } catch (error) {
+        console.log(error)
         if (error instanceof Error) {
             return httpResponse.Error(res, error.message)
         }

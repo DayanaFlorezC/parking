@@ -6,7 +6,9 @@ import {
     getRegisterController,
     getRegistersController,
     updateRegisterController,
-    createExitRegisterVeh
+    createExitRegisterVeh,
+    getStadisticsVehicles,
+    getEarningsControllers
 } from '../controller/vehicle.controller';
 
 import {
@@ -54,21 +56,10 @@ router.delete("/vehicle/:id",
 
 //? Indicadores
 
-router.get("/vehicle/ind/earnings", (req, res) => {
-    res.send('ok')
-})
+router.get("/vehicle/ind/earnings",  authMiddleware as RequestHandler, getEarningsControllers as RequestHandler)
 
-router.get("/vehicle/ind/registers", (req, res) => {
-    res.send('ok')
-})
+router.get("/vehicle/ind/registers",  authMiddleware as RequestHandler, getStadisticsVehicles as RequestHandler)
 
-router.get("/vehicle/ind/parkings", (req, res) => {
-    res.send('ok')
-})
-
-router.get("/vehicle/ind/partners", (req, res) => {
-    res.send('ok')
-})
 
 
 export default router;

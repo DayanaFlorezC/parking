@@ -1,8 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, BaseEntity } from "typeorm"
 import { validate, IsEmail } from "class-validator"
 
 @Entity()
-export class Email {
+export class Email extends BaseEntity {
 
     @PrimaryGeneratedColumn()
     id!: number
