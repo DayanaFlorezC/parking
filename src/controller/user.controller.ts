@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Httpresponse } from "../utils/response/http.response"
+import { Httpresponse } from "../middlewares/response/http.response"
 
 const httpResponse = new Httpresponse()
 
@@ -13,6 +13,7 @@ import {
   sendEmailService,
   getTopPartnersIndService
 } from '../services/user.service'
+import { ValidationsExceptions } from "../middlewares/exceptions/exceptions.error";
 
 
 export const getUsers = async (req: any, res: Response) => {
@@ -25,6 +26,10 @@ export const getUsers = async (req: any, res: Response) => {
   } catch (error) {
     if (error instanceof Error) {
       return httpResponse.Error(res, error.message)
+    }
+
+    if(error instanceof ValidationsExceptions){
+      return httpResponse.BadRequest(res, error.message)
     }
   }
 };
@@ -45,6 +50,10 @@ export const getUser = async (req: any, res: Response) => {
     if (error instanceof Error) {
       return httpResponse.Error(res, error.message)
     }
+
+    if(error instanceof ValidationsExceptions){
+      return httpResponse.BadRequest(res, error.message)
+    }
   }
 };
 
@@ -60,6 +69,10 @@ export const createUser = async (req: any, res: Response) => {
   } catch (error) {
     if (error instanceof Error) {
       return httpResponse.Error(res, error.message)
+    }
+
+    if(error instanceof ValidationsExceptions){
+      return httpResponse.BadRequest(res, error.message)
     }
   }
 
@@ -81,6 +94,10 @@ export const login = async (req: Request, res: Response) => {
     if (error instanceof Error) {
       return httpResponse.Error(res, error.message)
     }
+
+    if(error instanceof ValidationsExceptions){
+      return httpResponse.BadRequest(res, error.message)
+    }
   }
 }
 
@@ -95,12 +112,16 @@ export const updateUser = async (req: any, res: Response) => {
 
     const resp = await updateUserService(req.body, +id)
 
-    if (!resp) return httpResponse.NotFound(res, 'User not found')
+    if (!resp?.affected) return httpResponse.NotFound(res, 'User not found')
 
-    return httpResponse.OK(res, resp)
+    return httpResponse.OK(res, 'Usuario editado con éxito')
   } catch (error) {
     if (error instanceof Error) {
       return httpResponse.Error(res, error.message)
+    }
+
+    if(error instanceof ValidationsExceptions){
+      return httpResponse.BadRequest(res, error.message)
     }
   }
 };
@@ -110,31 +131,39 @@ export const deleteUser = async (req: Request, res: Response) => {
   try {
     const result = await deleteUserService(+id)
 
-    if (!result)
+    if (!result?.affected)
       return httpResponse.NotFound(res, 'User not found');
 
-    return httpResponse.OK(res, result)
+    return httpResponse.OK(res, 'Usuario borrado con éxito')
   } catch (error) {
     if (error instanceof Error) {
       return httpResponse.Error(res, error.message)
+    }
+
+    if(error instanceof ValidationsExceptions){
+      return httpResponse.BadRequest(res, error.message)
     }
   }
 };
 
 
-export const sendEmailController = async (req: Request, res: Response) =>{
+export const sendEmailController = async (req: any, res: Response ) =>{
   try {
     const data = req.body;
 
     const result = await sendEmailService(data)
 
-    if(!result) return httpResponse.NotFound(res, 'not found');
+    if(!result) return httpResponse.NotFound(res, 'No se puedo enviar el correo electrónico');
     
     return httpResponse.OK(res, result)
   } catch (error) {
     console.log(error)
     if (error instanceof Error) {
       return httpResponse.Error(res, error.message)
+    }
+
+    if(error instanceof ValidationsExceptions){
+      return httpResponse.BadRequest(res, error.message)
     }
   }
 
@@ -150,6 +179,10 @@ export const getTopPartnersIndControllers = async (req: Request, res: Response) 
     console.log(error)
     if (error instanceof Error) {
       return httpResponse.Error(res, error.message)
+    }
+
+    if(error instanceof ValidationsExceptions){
+      return httpResponse.BadRequest(res, error.message)
     }
   }
 

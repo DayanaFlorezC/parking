@@ -8,6 +8,8 @@ import {
     JoinColumn 
 } from "typeorm";
 
+import {ValidationsExceptions} from "../middlewares/exceptions/exceptions.error"
+
 import {
     IsInt,
     Length,
@@ -25,7 +27,9 @@ export class Vehicle extends BaseEntity {
     id!: number
 
     @Column()
-    @Length(6)
+    @Length(6,6, {
+        message: 'Placa tiene que ser de 6 caracteres',
+      })
     placa!: string
     
     @Column()
@@ -56,7 +60,7 @@ export class Vehicle extends BaseEntity {
     async validateEntity() {
         const errors = await validate(this);
         if (errors.length > 0) {
-            throw new Error(`Validation failed! ${errors}`);
+            throw new ValidationsExceptions(`Validation failed! ${errors}`);
         }
     }
 }

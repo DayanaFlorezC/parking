@@ -1,20 +1,13 @@
-export const validFieldsAllowsUpdate = async (fieldsAllows: [], dataUpdate: any) =>{
-    try{
 
-        const obj = {
-        }
+export const validFieldsAllowsUpdate = async (fieldsAllows: string[], dataUpdate: Record<string, any>) => {
 
+        const obj: Record<string, any> = {};
         for (const key in dataUpdate) {
-            if (Object.prototype.hasOwnProperty.call(dataUpdate, key)) {
-                const element = dataUpdate[key];
-                //if(fieldsAllows.includes(key)) obj[key]=element
-            }
+
+            const element = dataUpdate[key]
+            if (fieldsAllows.includes(key)) obj[key] = element
         }
 
         return obj
-        
-    }catch(err){
-        console.log(err)
-        return false
-    }
+
 }

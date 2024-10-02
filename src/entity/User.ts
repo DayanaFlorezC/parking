@@ -7,6 +7,7 @@ import {
 
 import { Parking } from "./Parking";
 import { Vehicle } from "./Vehicle";
+import { ValidationsExceptions } from "../middlewares/exceptions/exceptions.error";
 
 @Entity()
 @Unique(["email"])
@@ -22,7 +23,7 @@ export class User extends BaseEntity {
     @IsEmail()
     email!: string
 
-    @Column({  })
+    @Column({ select: false })
     password!: string
 
     @Column()
@@ -42,7 +43,7 @@ export class User extends BaseEntity {
     async validateEntity() {
         const errors = await validate(this);
         if (errors.length > 0) {
-            throw new Error(`Validation failed! ${errors}`);
+            throw new ValidationsExceptions(`Validation failed! ${errors}`);
         }
     }
 

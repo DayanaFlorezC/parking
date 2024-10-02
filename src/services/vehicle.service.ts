@@ -20,7 +20,7 @@ import {
     getParking
 } from '../repository/parking.repository'
 
-import { ValidationsExceptions } from "../exceptions/exceptions.error"
+import { ValidationsExceptions } from "../middlewares/exceptions/exceptions.error"
 
 
 
@@ -33,39 +33,25 @@ export const getRegistersService = async (query: object) => {
 }
 
 export const createRegisterService = async (data: Vehicle) => {
-    try {
-        const { placa, parkingId } = data
-        const register = await getRegisterWithoutDateOut({ placa, parkingId })
+    const { placa, parkingId, partnerId } = data
 
-        if (register) return {
-            exception: true,
-            msg: "Ya existe un registro en el parqueadero con dicha placa"
-        }
+    const register = await getRegisterWithoutDateOut({ placa })
 
-        //validacion de capacidad
-        const parking = await getParking({}, parkingId)
+    if (register) throw new ValidationsExceptions('Ya existe un registro con dicha placa sin salida registrada')
 
-        if (!parking) return {
-            exception: true,
-            msg: "No existe el parqueadero"
-        }
+    const parking = await getParking({}, parkingId)
 
-        if (parking.capacity < parking.vehicles.length) return {
-            exception: true,
-            msg: "No hay espacio"
-        }
+    if (!parking) throw new ValidationsExceptions("No existe el parqueadero")
 
-        //validation 
+    if(parking?.userId !== +partnerId) throw new ValidationsExceptions('No tienes permiso para agregar un nuevo registro a este parqueadero')
 
-        return await createRegister(data)
-    } catch (error) {
-        console.log(error)
-        throw new Error("Error en el servicio crear entrada de vehiculo");
-    }
+    if (parking.capacity < parking.vehicles.length + 1) throw new ValidationsExceptions("No hay espacio")
+
+    return await createRegister(data)
 
 }
 
-export const updateRegisterService = async (updateData: Vehicle, id: number) => {
+export const updateRegisterService = async (updateData: Vehicle, id: number ) => {
     return await updateRegister(updateData, id)
 }
 
@@ -73,92 +59,73 @@ export const deleteRegisterService = async (id: number) => {
     return await deleteRegister(id)
 }
 
-export const createExitRegisterVehService = async (placa: string, parkingId: number) => {
+export const createExitRegisterVehService = async (placa: string, parkingId: number, partnerId: number) => {
 
-    try {
-        const register = await getRegisterWithoutDateOut({ placa, parkingId })
+    const register = await getRegisterWithoutDateOut({ placa, parkingId })
 
-        if (!register) return {
-            exception: true,
-            msg: 'El registro no existe en la base de datos'
-        }
+    if (!register) throw new ValidationsExceptions('El registro no existe en la base de datos')
 
-        const parking = await getParking({}, parkingId)
+    const parking = await getParking({}, parkingId)
 
-        if (!parking) return {
-            exception: true,
-            msg: 'El parqueadero no existe'
-        }
+    if (!parking) throw new ValidationsExceptions('El parqueadero no existe')
 
-        let hours = Math.abs(new Date().getTime() - register.dateIn.getTime()) / 36e5;
+        if(parking?.userId !== +partnerId) throw new ValidationsExceptions('No tienes permiso para agregar un nuevo registro a este parqueadero')
 
-        const mod = hours % 1;
+    let hours = Math.abs(new Date().getTime() - register.dateIn.getTime()) / 36e5;
 
-        if (mod) {
-            hours = Math.ceil(hours);
-        }
+    const mod = hours % 1;
 
-        const total = parking.costByHour * hours
-
-        const updateData = {
-            dateOut: new Date(),
-            cost: total
-        }
-
-        const id = register.id
-
-        const resp = await updateRegister(updateData, id)
-        return resp
-    } catch (error) {
-        console.log(error)
-        throw new Error("Error en el servicio crear salida de vehiculo");
-
+    if (mod) {
+        hours = Math.ceil(hours);
     }
+
+    const total = parking.costByHour * hours
+
+    const updateData = {
+        dateOut: new Date(),
+        cost: total
+    }
+
+    const id = register.id
+
+    return await updateRegister(updateData, id)
 
 }
 
 
 export const getTopVehService = async (parkingId: number, type: string) => {
-    try {
 
-        switch (type) {
-            case "all":
-                return await getTopVeh()
-            case "first":
-                return await getFirstVeh(parkingId)
-            case "one":
-                return await getTopVehOneParking(parkingId)
-            default:
-                return false
-        }
 
-    } catch (error) {
-        console.log(error)
-        throw new Error("Error en el servicio indicador vehiculos");
+    switch (type) {
+        case "all":
+            return await getTopVeh()
+        case "first":
+            return await getFirstVeh(parkingId)
+        case "one":
+            return await getTopVehOneParking(parkingId)
+        default:
+            return false
     }
 
 }
 
 
 export const getEarningsService = async (type: string, parkingId: number) => {
-    try {
-        switch (type) {
-            case 'all':
-                return await getEarnings(parkingId)
-            case 'today':
-                return await getEarningsToday(parkingId)
-            case 'lastweek':
-                return await getEarningsLastWeek(parkingId)
-            case 'lastmonth':
-                return await getEarningsLastMonth(parkingId)
-            case 'lastyear':
-                return await getEarningsLastYear(parkingId)
 
-            default:
-                return false
-        }
-    } catch (error) {
-        console.log(error)
-        throw new Error("Error en el servicio indicador ganancias");
+    switch (type) {
+        case 'all':
+            return await getEarnings(parkingId)
+        case 'today':
+            return await getEarningsToday(parkingId)
+        case 'lastweek':
+            return await getEarningsLastWeek(parkingId)
+        case 'lastmonth':
+            return await getEarningsLastMonth(parkingId)
+        case 'lastyear':
+            return await getEarningsLastYear(parkingId)
+
+        default:
+            return false
     }
+
 }

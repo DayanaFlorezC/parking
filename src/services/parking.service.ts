@@ -8,44 +8,43 @@ import {
     getTopParkings
 } from '../repository/parking.repository';
 
-export const getParkingService = async (query: object, id: number) =>{
-        return await getParking(query, id) 
+import { ValidationsExceptions } from '../middlewares/exceptions/exceptions.error'
+import { validFieldsAllowsUpdate } from '../utils/validateFieldsUpdate';
+
+export const getParkingService = async (query: object, id: number) => {
+    return await getParking(query, id)
 }
 
-export const getParkingsService = async (query : object) =>{
-        return await getParkings(query)
+export const getParkingsService = async (query: object) => {
+    return await getParkings(query)
 }
 
-export const createParkingService = async (data: Parking) =>{
-    try {
-        return await createParking(data)
-    } catch (error) {
-        throw new Error("Error en el servicio de crear parqueadero");
-    }
-       
+export const createParkingService = async (data: Parking) => {
+    return await createParking(data)
 }
 
-export const updateParkingService = async (updateData: Parking, id: number) =>{
-    try {
-        const parking = await getParking({}, id)
+export const updateParkingService = async (updateData: Parking, id: number) => {
 
-        if(!parking) return null
+    const fieldsAllows = ['name', 'capacity', 'costByHour']
 
+    const dataUpdateValid = await validFieldsAllowsUpdate(fieldsAllows, updateData)
 
-        return await updateParking(updateData, id)
-    } catch (error) {
-        console.log(error)
-        throw new Error("Error en servicio update parking");
-        
-    }
-        
+    const parking = await getParking({}, id)
+
+    if (updateData.capacity && parking?.vehicles.length > updateData.capacity)
+        throw new ValidationsExceptions('No se puede actualizar la capacidad del parqueadero, si su capacidad actual es mayor a la que se desea modificar ')
+
+    if (!parking) return null
+
+    return await updateParking(dataUpdateValid, id)
+
 }
 
-export const deleteParkingService = async (id: number) =>{
-        return await deleteParking(id)
+export const deleteParkingService = async (id: number) => {
+    return await deleteParking(id)
 }
 
 
-export const getTopParkingsService = async () =>{
+export const getTopParkingsService = async () => {
     return await getTopParkings()
 }

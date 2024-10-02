@@ -13,10 +13,11 @@ import {
     IsInt,
     IsDate,
     Min,
-    validate
+    validate,
 } from "class-validator"
 import { User } from "./User";
 import { Vehicle } from "./Vehicle";
+import { ValidationsExceptions } from "../middlewares/exceptions/exceptions.error";
 
 @Entity()
 export class Parking extends BaseEntity {
@@ -54,7 +55,7 @@ export class Parking extends BaseEntity {
     async validateEntity() {
         const errors = await validate(this);
         if (errors.length > 0) {
-            throw new Error(`Validation failed! ${errors}`);
+            throw new ValidationsExceptions(`Validation failed! ${errors}`);
         }
     }
 

@@ -41,11 +41,13 @@ router.post("/vehicle/exit",
     createExitRegisterVeh as RequestHandler
 )
 
+/*
 router.put("/vehicle/:id", 
     authMiddleware as RequestHandler, 
     authSocio as RequestHandler,
     updateRegisterController as RequestHandler
 );
+*/
 
 router.delete("/vehicle/:id", 
     authMiddleware as RequestHandler, 

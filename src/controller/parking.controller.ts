@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Httpresponse } from "../utils/response/http.response";
+import { Httpresponse } from "../middlewares/response/http.response";
 
 import {
     createParkingService,
@@ -9,6 +9,7 @@ import {
     deleteParkingService,
     getTopParkingsService
 } from '../services/parking.service'
+import { ValidationsExceptions } from "../middlewares/exceptions/exceptions.error";
 
 const httpResponse = new Httpresponse()
 
@@ -25,6 +26,10 @@ export const getParkingController = async (req: Request, res: Response) => {
         if (error instanceof Error) {
             return httpResponse.Error(res, error.message)
         }
+
+        if (error instanceof ValidationsExceptions) {
+            return httpResponse.BadRequest(res, error.message)
+        }
     }
 }
 
@@ -40,7 +45,11 @@ export const getParkingsController = async (req: Request, res: Response) => {
     } catch (error) {
         if (error instanceof Error) {
             return httpResponse.Error(res, error.message)
-        }
+          }
+      
+          if(error instanceof ValidationsExceptions){
+            return httpResponse.BadRequest(res, error.message)
+          }
     }
 }
 
@@ -52,13 +61,17 @@ export const updateParkingController = async (req: Request, res: Response) => {
 
         const resp = await updateParkingService(data, +id)
 
-        if (!resp) return httpResponse.NotFound(res, 'Parking not found');
+        if (!resp?.affected) return httpResponse.NotFound(res, 'Parking not found');
 
-        return httpResponse.OK(res, resp)
+        return httpResponse.OK(res, 'Parking updated')
     } catch (error) {
         if (error instanceof Error) {
             return httpResponse.Error(res, error.message)
-        }
+          }
+      
+          if(error instanceof ValidationsExceptions){
+            return httpResponse.BadRequest(res, error.message)
+          }
     }
 }
 
@@ -69,13 +82,17 @@ export const deleteParkingController = async (req: Request, res: Response) => {
 
         const resp = await deleteParkingService(+id)
 
-        if (!resp) return httpResponse.NotFound(res, 'Parking not found');
+        if (!resp?.affected) return httpResponse.NotFound(res, 'Parking not found');
 
-        return httpResponse.OK(res, resp)
+        return httpResponse.OK(res, 'Parking deleted')
     } catch (error) {
         if (error instanceof Error) {
             return httpResponse.Error(res, error.message)
-        }
+          }
+      
+          if(error instanceof ValidationsExceptions){
+            return httpResponse.BadRequest(res, error.message)
+          }
     }
 }
 
@@ -92,7 +109,11 @@ export const createParkingController = async (req: Request, res: Response) => {
     } catch (error) {
         if (error instanceof Error) {
             return httpResponse.Error(res, error.message)
-        }
+          }
+      
+          if(error instanceof ValidationsExceptions){
+            return httpResponse.BadRequest(res, error.message)
+          }
     }
 }
 
@@ -105,6 +126,10 @@ export const getTopParkingsController = async (req: Request, res: Response) => {
         console.log(error)
         if (error instanceof Error) {
             return httpResponse.Error(res, error.message)
-        }
+          }
+      
+          if(error instanceof ValidationsExceptions){
+            return httpResponse.BadRequest(res, error.message)
+          }
     }
 }

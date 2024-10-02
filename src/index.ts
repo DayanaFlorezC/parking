@@ -12,7 +12,7 @@ async function main() {
             initSeeders()
         })
         App.listen(process.env.PORT)
-        console.log('servidor corriendo en el puerto 8000')
+        console.log('servidor corriendo en el puerto ' + process.env.PORT)
     } catch (error) {
         console.log(error)
     }
