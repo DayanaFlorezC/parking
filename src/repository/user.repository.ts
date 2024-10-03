@@ -1,5 +1,4 @@
 import { User } from "../entity/User";
-import { Email } from "../entity/Email";
 
 import { AppDataSource } from "../data-source";
 
@@ -58,35 +57,16 @@ export const deleteUser = async (id: number) => {
   return await User.delete({ id: id });
 };
 
-
-export const createEmail = async (data: Email) => {
-  try {
-    const { to, from, subject, message } = data;
-    const email = new Email();
-    email.to = to;
-    email.from = from;
-    email.subject = subject;
-    email.createdAt = new Date();
-    email.message = message;
-    await email.save();
-
-    return email
-
-  } catch (error) {
-    console.log(error)
-  }
-}
-
 //?Indicador socios
 export const getTopSocios = async () => {
 
     const oneWeekAgo = new Date(new Date().setDate(new Date().getDate() - 7));
     const UserRepository = AppDataSource.getRepository('User')
-
+   
     return await UserRepository.createQueryBuilder('user')
-      .leftJoinAndSelect("user.vehicles", "vehicle")
+      .leftJoin("user.vehicles", "vehicle")
       .where('vehicle.dateIn > :oneWeekAgo', { oneWeekAgo })
-      .select('user.id', 'id')
+      .select('user.id', 'idpartner')
       .addSelect('COUNT(vehicle.id)', 'vehiclecount')
       .groupBy('user.id')
       .orderBy('vehiclecount', 'DESC')

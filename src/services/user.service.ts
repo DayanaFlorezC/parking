@@ -86,11 +86,8 @@ export const sendEmailService = async (data: any) => {
             body: JSON.stringify(data)
         })
 
-        if (response.status === 200) {
-            return true
-        } else {
-            return false
-        }
+
+        return response.status === 200
 
     } catch (error) {
         console.log(error)

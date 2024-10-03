@@ -20,7 +20,7 @@ import {
     getParking
 } from '../repository/parking.repository'
 
-import { ValidationsExceptions } from "../middlewares/exceptions/exceptions.error"
+import { ValidationsExceptions, ValidationExceptionForbiden } from "../middlewares/exceptions/exceptions.error"
 
 
 
@@ -43,7 +43,7 @@ export const createRegisterService = async (data: Vehicle) => {
 
     if (!parking) throw new ValidationsExceptions("No existe el parqueadero")
 
-    if(parking?.userId !== +partnerId) throw new ValidationsExceptions('No tienes permiso para agregar un nuevo registro a este parqueadero')
+    if(parking?.userId !== +partnerId) throw new ValidationExceptionForbiden('No tienes permiso para agregar un nuevo registro a este parqueadero')
 
     if (parking.capacity < parking.vehicles.length + 1) throw new ValidationsExceptions("No hay espacio")
 
@@ -69,7 +69,7 @@ export const createExitRegisterVehService = async (placa: string, parkingId: num
 
     if (!parking) throw new ValidationsExceptions('El parqueadero no existe')
 
-        if(parking?.userId !== +partnerId) throw new ValidationsExceptions('No tienes permiso para agregar un nuevo registro a este parqueadero')
+    if(parking?.userId !== +partnerId) throw new ValidationsExceptions('No tienes permiso para agregar un nuevo registro a este parqueadero')
 
     let hours = Math.abs(new Date().getTime() - register.dateIn.getTime()) / 36e5;
 

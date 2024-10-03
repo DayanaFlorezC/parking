@@ -5,17 +5,16 @@ import {
     BaseEntity, 
     BeforeInsert,
     ManyToOne, 
-    JoinColumn 
+    JoinColumn, 
 } from "typeorm";
 
 import {ValidationsExceptions} from "../middlewares/exceptions/exceptions.error"
 
 import {
-    IsInt,
     Length,
     IsDate,
-    Min,
-    validate
+    validate,
+    Matches
 } from "class-validator"
 import { Parking } from "./Parking";
 import { User } from "./User";
@@ -27,9 +26,8 @@ export class Vehicle extends BaseEntity {
     id!: number
 
     @Column()
-    @Length(6,6, {
-        message: 'Placa tiene que ser de 6 caracteres',
-      })
+    @Length(6,6, { message: 'La placa debe tener exactamente 6 caracteres.' })
+    @Matches(/^[A-Za-z0-9]+$/, { message: 'La placa no puede contener ñ ni caracteres especiales.' })
     placa!: string
     
     @Column()

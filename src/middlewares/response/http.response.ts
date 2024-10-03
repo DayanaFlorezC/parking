@@ -49,4 +49,12 @@ export class Httpresponse {
           data,
         })
       }
+
+      Forbiden(res: Response, data: any){
+        return res.status(StatusCodes.FORBIDDEN).json({
+          status: StatusCodes.FORBIDDEN,
+          statusMessage: ReasonPhrases.FORBIDDEN,
+          data,
+        })
+      }
 }

@@ -11,7 +11,8 @@ import {
     getTopVehService,
     getEarningsService
 } from "../services/vehicle.service";
-import { ValidationsExceptions } from "../middlewares/exceptions/exceptions.error";
+
+import { ValidationExceptionForbiden, ValidationsExceptions } from "../middlewares/exceptions/exceptions.error";
 
 const httpResponse = new Httpresponse()
 
@@ -29,6 +30,10 @@ export const createRegisterController = async (req: any, res: Response) =>{
     } catch (error) {
         if (error instanceof ValidationsExceptions) {
             return httpResponse.BadRequest(res, error.message)
+        }
+
+        if(error instanceof ValidationExceptionForbiden){
+            return httpResponse.Forbbiden(res, error.message)
         }
 
         if (error instanceof Error) {

@@ -1,0 +1,27 @@
+
+#get top vehi todos parqueaderos
+SELECT "vehicle"."placa" AS "placa", COUNT("vehicle"."id") AS "vehiclecount" FROM "vehicle" "vehicle" GROUP BY "vehicle"."placa" ORDER BY vehiclecount DESC LIMIT 10
+#get top vehi un parqueadero
+SELECT "vehicle"."id" AS "vehicle_id", "vehicle"."placa" AS "vehicle_placa", "vehicle"."partnerId" AS "vehicle_partnerId", "vehicle"."dateIn" AS "vehicle_dateIn", "vehicle"."dateOut" AS "vehicle_dateOut", "vehicle"."cost" AS "vehicle_cost", "vehicle"."parkingId" AS "vehicle_parkingId", COUNT("vehicle"."id") AS "vehiclecount" FROM "vehicle" "vehicle" WHERE "vehicle"."parkingId" = :parkingId GROUP BY "vehicle"."placa" ORDER BY vehiclecount DESC LIMIT 10
+#get top 10 veh primera vez en un parqueadero
+SELECT "vehicle"."placa" AS "placa", COUNT("vehicle"."id") AS "vehiclecount" FROM "vehicle" "vehicle" WHERE "vehicle"."parkingId" = :parkingId AND "vehicle"."dateOut" IS NULL GROUP BY "vehicle"."placa" HAVING COUNT("vehicle"."id") = 1 LIMIT 10
+#get todas las ganancias que ha obtenido un parqueadero
+SELECT SUM("vehicle"."cost") AS "total" FROM "vehicle" "vehicle" WHERE "vehicle"."parkingId" = :parkingId
+#ganancias hoy
+SELECT SUM(vehicle.cost) AS total
+FROM Vehicle vehicle
+WHERE vehicle.parkingId = :parkingId
+AND vehicle.dateIn >= :startOfDay
+AND vehicle.dateIn < :endOfDay;
+
+
+SELECT SUM("vehicle"."cost") AS "total" FROM "vehicle" "vehicle" WHERE "vehicle"."parkingId" = :parkingId AND "vehicle"."dateIn" >= :startOfDay AND "vehicle"."dateIn" < :endOfDay
+
+#ganancias semana, MES, AÑO son igual que la de hoy, pero cambia el rango de fecha
+
+# get top 3 socios 
+SELECT "user"."id" AS "idpartner", COUNT("vehicle"."id") AS "vehiclecount" FROM "user" "user" LEFT JOIN "vehicle" "vehicle" ON "vehicle"."partnerId"="user"."id" WHERE "vehicle"."dateIn" > :oneWeekAgo GROUP BY "user"."id" ORDER BY vehiclecount DESC LIMIT 3
+
+#get top 3 parqueaderos 
+
+SELECT "parking"."id" AS "idparking", SUM("vehicle"."cost") AS "total" FROM "parking" "parking" LEFT JOIN "vehicle" "vehicle" ON "vehicle"."parkingId"="parking"."id" WHERE "vehicle"."dateIn" > :oneWeekAgo GROUP BY "parking"."id" ORDER BY total DESC LIMIT 3

@@ -54,10 +54,11 @@ export const getTopParkings = async () => {
   const oneWeekAgo = new Date(new Date().setDate(new Date().getDate() - 7));
   const ParkRepository = AppDataSource.getRepository('Parking')
 
+
   return await ParkRepository.createQueryBuilder('parking')
-    .leftJoinAndSelect("parking.vehicles", "vehicle")
+    .leftJoin("parking.vehicles", "vehicle")
     .where('vehicle.dateIn > :oneWeekAgo', { oneWeekAgo })
-    .select('parking.id', 'id')
+    .select('parking.id', 'idparking')
     .addSelect('SUM(vehicle.cost)', 'total')
     .groupBy('parking.id')
     .orderBy('total', 'DESC')
