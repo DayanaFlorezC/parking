@@ -72,16 +72,6 @@ export const getTopVehOneParking = async (parkingId: number) => {
 
   const vehRepository = AppDataSource.getRepository('Vehicle')
 
-  const resp = vehRepository.createQueryBuilder('vehicle')
-    .addSelect('COUNT(vehicle.id)', 'vehiclecount')
-    .groupBy('vehicle.placa')
-    .where("vehicle.parkingId = :parkingId", { parkingId: parkingId })
-    .orderBy('vehiclecount', 'DESC')
-    .limit(10)
-    .getQuery()
-
-  console.log(resp)
-
   return await vehRepository.createQueryBuilder('vehicle')
     .select('vehicle.placa', 'placa')
     .addSelect('COUNT(vehicle.id)', 'vehiclecount')

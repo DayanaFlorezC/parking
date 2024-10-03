@@ -156,7 +156,7 @@ export const getStadisticsVehicles = async (req: Request, res: Response ) =>{
     try{
 
         const parkingId = req.query.parkingId || 16;
-        const type = (req.query.type === undefined) ? 'all' : req.query.type+'';
+        const type = req.query.type+'';
 
         const resp =await getTopVehService(+parkingId, type);
         if(!resp) return httpResponse.NotFound(res, 'not found');
@@ -179,7 +179,7 @@ export const getEarningsControllers = async (req: Request, res: Response) =>{
     try {
 
         const parkingId = req.query.parkingId || 16;
-        const type = (req.query.type === undefined) ? 'all' : req.query.type+'';
+        const type = req.query.type+'';
 
         const resp = await getEarningsService(type, +parkingId)
         if(!resp) return httpResponse.NotFound(res, 'not found');

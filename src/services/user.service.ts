@@ -1,6 +1,6 @@
 import { User } from '../entity/User';
 
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import jwt from "jsonwebtoken";
 
 
@@ -16,6 +16,14 @@ import {
     getTopSocios,
     getUserByEmail
 } from '../repository/user.repository'
+
+import {
+    getRegisterWithoutDateOut
+} from "../repository/register.repository"
+
+import {
+    getParking
+} from "../repository/parking.repository"
 
 import { ValidationsExceptions } from '../middlewares/exceptions/exceptions.error'
 
@@ -76,6 +84,17 @@ export const loginService = async (email: string, password: string) => {
 
 export const sendEmailService = async (data: any) => {
 
+
+    const register = await getRegisterWithoutDateOut({ placa: data.placa, parkingId: data.parqueaderoId })
+
+    if (!register) throw new ValidationsExceptions('No existe el registro de un vehiculo')
+
+    const parking = await getParking({}, register.parkingId)
+
+    if(!parking) throw new ValidationsExceptions('No existe el parqueadero')
+
+    data.parqueaderoNombre = parking?.name
+
     try {
         const uri = `${process.env.URI_MAILSERVIVE}/api/email`
         const response = await fetch(uri, {
@@ -91,7 +110,7 @@ export const sendEmailService = async (data: any) => {
 
     } catch (error) {
         console.log(error)
-        throw new Error("Error en send email");
+        throw new Error("Error en la petición");
 
     }
 

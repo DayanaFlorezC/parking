@@ -4,5 +4,5 @@ node_modules/
 build/
 tmp/
 temp/
-.query-sql/
-.env/
+query-sql/
+env/
